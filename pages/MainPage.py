@@ -39,18 +39,11 @@ class MainPage:
 
     @allure.step("Поиск случайного фильма по жанру")
     def search_by_genre_random(self, genre: str):
-        genre_list_title = self.wait.until(
-            EC.element_to_be_clickable((By.ID, "genreListTitle")))
-        genre_list_title.click()
-        genre_input = self.wait.until(
-            EC.visibility_of_element_located((
-                By.CSS_SELECTOR, f"input[data-name='{genre}']")))
-        if not genre_input.is_selected():
-            genre_input.click()
-        genre_list_title.click()
-        search_button = self.wait.until(
-            EC.element_to_be_clickable((By.ID, "search")))
-        search_button.click()
+        self._driver.find_element(By.ID, "genreListTitle").click()
+        self._driver.find_element(
+            By.CSS_SELECTOR, f"input[data-name='{genre}']").is_selected()
+        self._driver.find_element(By.ID, "genreListTitle").click()
+        self._driver.find_element(By.ID, "search").click()
 
     @allure.step("Получение названия произвольного фильма")
     def get_film_title(self):
