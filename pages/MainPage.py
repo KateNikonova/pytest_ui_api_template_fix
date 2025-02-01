@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 @allure.epic("UI тесты")
 class MainPage:
 
@@ -11,9 +12,9 @@ class MainPage:
         self._driver.maximize_window()
         self.wait = WebDriverWait(driver, 10)
 
-    @allure.step("Открытие формы(переход на страницу)")
-    def open_form(self):
-        self._driver.get("https://www.kinopoisk.ru")
+    @allure.step("Открыть заданную страницу")
+    def open_page(self, url):
+        self._driver.get(url)
 
     @allure.step("Ввод фразы в поиск")
     def enter_search_name(self, name: str):
@@ -22,7 +23,7 @@ class MainPage:
         search_input.clear()
         search_input.send_keys(name)
 
-    @allure.step("Клик на 'лупу' в строке поиска")
+    @allure.step("Подтверждение поиска")
     def submit_search(self):
         search_button = self.wait.until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type=submit]")))
@@ -36,6 +37,38 @@ class MainPage:
         film_links_titles = self._driver.find_elements(
             By.CSS_SELECTOR, "h4.kinopoisk-header-suggest-item__title a")
         return [film_title.text for film_title in film_links_titles]
+
+    @allure.step("Выбор фильма")
+    def select_film(self, film_id):
+        film_by_id = self.wait.until(
+            EC.element_to_be_clickable((By.ID, f"suggest-item-film-{film_id}")))
+        film_by_id.click()
+
+    @allure.step("Клип по кнопке 'Оценить фильм'")
+    def click_rate_film(self):
+        rate_button = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//button[text()='Оценить фильм']")))
+        rate_button.click()
+
+    @allure.step("Клип по кнопке 'Оценить фильм'")
+    def rate_film(self, rating):
+        button = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, f"//button[contains(@aria-label, 'Оценка {rating}')]")))
+        button.click()
+
+    @allure.step("Получение рейтинга")
+    def get_rating(self):
+        element = self.wait.until(
+            EC.visibility_of_element_located((By.XPATH, "//span[@data-tid='5cb64c50']"))
+        )
+        return element.text
+
+    @allure.step("Нажатие на кнопку 'Буду смотреть'")
+    def click_watch_button(self):
+        button = self.wait.until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button[title='Буду смотреть']"))
+        )
+        button.click()
 
     @allure.step("Поиск случайного фильма по жанру")
     def search_by_genre_random(self, genre: str):
